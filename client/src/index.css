@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+#root {
+  max-width: 100%;
+  min-height: 100svh;
+}
+body {
+  @apply bg-amber-900;
+}
+
+
+
