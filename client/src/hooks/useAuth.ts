@@ -1,10 +1,15 @@
+// src/hooks/useAuth.ts
 import { useEffect, useState } from "react"
 import api from "../lib/api"
-import Navbar from "../components/Navbar"
-import Analyze from "../components/Analyze"
 
-export default function DashboardPage() {
-  const [user, setUser] = useState<{ username: string; name: string; lastName: string } | null>(null)
+type User = {
+  username: string
+  name: string
+  lastName: string
+}
+
+export function useAuth() {
+  const [userAuth, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -12,6 +17,7 @@ export default function DashboardPage() {
       window.location.href = "/login"
       return
     }
+
     api.post("/api/user", { token })
       .then(res => setUser(res.data))
       .catch(() => {
@@ -20,10 +26,5 @@ export default function DashboardPage() {
       })
   }, [])
 
-  return (
-    <>
-      <Navbar username={user?.username} name={user?.name} lastname={user?.lastName} />
-      <Analyze />
-    </>
-  )
+  return { userAuth }
 }

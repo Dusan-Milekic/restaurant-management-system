@@ -1,5 +1,5 @@
 import { useState } from "react"
-import axios from "axios"
+import api from "../lib/api"
 
 export default function LoginForm() {
   const [username, setUsername] = useState("")
@@ -8,10 +8,7 @@ export default function LoginForm() {
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.post("http://localhost:3000/api/login", {
-        username,
-        password,
-      })
+      const res = await api.post("/api/login", { username, password })
       if (!res.data.token) {
         setError("Pogrešno korisničko ime ili lozinka")
         return
@@ -26,7 +23,6 @@ export default function LoginForm() {
   return (
     <div className="min-h-screen bg-stone-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-
         <div className="text-center mb-10">
           <h1 className="font-serif text-4xl font-light tracking-widest uppercase text-stone-800">
             La<span className="text-amber-700">Belle</span>
@@ -35,10 +31,8 @@ export default function LoginForm() {
             Restoran sistem
           </p>
         </div>
-
         <div className="bg-white border border-stone-200 rounded-2xl p-8 shadow-sm">
           <div className="flex flex-col gap-6">
-
             <div className="flex flex-col gap-1">
               <label className="text-xs tracking-widest uppercase text-stone-400">
                 Korisničko ime
@@ -49,7 +43,6 @@ export default function LoginForm() {
                 onChange={(e) => setUsername(e.currentTarget.value)}
               />
             </div>
-
             <div className="flex flex-col gap-1">
               <label className="text-xs tracking-widest uppercase text-stone-400">
                 Lozinka
@@ -60,21 +53,17 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.currentTarget.value)}
               />
             </div>
-
             {error && (
               <p className="text-red-400 text-xs tracking-wide">{error}</p>
             )}
-
             <button
               className="w-full bg-amber-700 hover:bg-amber-800 text-white text-xs tracking-widest uppercase py-4 rounded-xl cursor-pointer transition-colors duration-200 mt-2"
               onClick={handleSubmit}
             >
               Prijava
             </button>
-
           </div>
         </div>
-
       </div>
     </div>
   )

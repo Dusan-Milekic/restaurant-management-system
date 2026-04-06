@@ -1,4 +1,4 @@
-export default function Navbar({ username, name, lastname }: {
+export default function Navbar({ name, lastname }: {
   username: string | undefined
   name: string | undefined
   lastname: string | undefined

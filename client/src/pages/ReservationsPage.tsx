@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "../lib/api"
 import Navbar from "../components/Navbar"
-
+import { useAuth } from "../hooks/useAuth"
 type Table = {
   id: number
   broj: number
@@ -17,45 +17,33 @@ type Reservation = {
 }
 
 export default function ReservationPage() {
-  const [user, setUser] = useState<{ username: string; name: string; lastName: string } | null>(null)
+ 
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [tables, setTables] = useState<Table[]>([])
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ nameReserved: "", tableId: "", date: "" })
 
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) {
-      window.location.href = "/login"
-      return
-    }
-    axios.post("http://localhost:3000/api/user", { token })
-      .then(res => setUser(res.data))
-      .catch(() => {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-      })
+const { userAuth } = useAuth()
 
-    axios.get("http://localhost:3000/api/reservations")
-      .then(res => setReservations(res.data.reservations))
+useEffect(() => {
+  api.get("/api/reservations")
+    .then(res => setReservations(res.data.reservations))
 
-    axios.get("http://localhost:3000/api/tables")
-      .then(res => setTables(res.data.tables))
-  }, [])
+  api.get("/api/tables")
+    .then(res => setTables(res.data.tables))
+}, [])
 
+  
 const handleSubmit = async () => {
   if (!form.nameReserved || !form.tableId || !form.date) return
   try {
-    await axios.post("http://localhost:3000/api/reservations", {
+    await api.post("/api/reservations", {
       nameReserved: form.nameReserved,
       tableId: parseInt(form.tableId),
       date: form.date,
     })
-    
-    // refetch umesto push u state
-    const res = await axios.get("http://localhost:3000/api/reservations")
+    const res = await api.get("/api/reservations")
     setReservations(res.data.reservations)
-    
     setForm({ nameReserved: "", tableId: "", date: "" })
     setShowForm(false)
   } catch {
@@ -64,7 +52,7 @@ const handleSubmit = async () => {
 }
   return (
     <>
-      <Navbar username={user?.username} name={user?.name} lastname={user?.lastName} />
+      <Navbar username={userAuth?.username} name={userAuth?.name} lastname={userAuth?.lastName} />
       <div className="max-w-5xl mx-auto px-6 py-10">
 
         <div className="flex items-center justify-between mb-10">

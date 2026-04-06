@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import axios from "axios"
+import api from "../lib/api"
 
 type OrderItem = {
   id: number
@@ -18,12 +18,12 @@ type MeniItem = {
 }
 
 type PaymentProps = {
-  tableId: number,
+  tableId: number
   tableNumber: number
   onClose: () => void
 }
 
-export default function Payment({ tableId,tableNumber, onClose }: PaymentProps) {
+export default function Payment({ tableId, tableNumber, onClose }: PaymentProps) {
   const STORAGE_KEY = `order_table_${tableNumber}`
 
   const [items, setItems] = useState<OrderItem[]>(() => {
@@ -35,7 +35,7 @@ export default function Payment({ tableId,tableNumber, onClose }: PaymentProps) 
   const [showSearch, setShowSearch] = useState(false)
 
   useEffect(() => {
-    axios.get("http://localhost:3000/api/meni")
+    api.get("/api/meni")
       .then(res => setMeni(res.data.meni))
       .catch(() => console.error("Greška pri učitavanju menija"))
   }, [])
@@ -70,23 +70,23 @@ export default function Payment({ tableId,tableNumber, onClose }: PaymentProps) 
     })
   }
 
-const handleNaplata = async () => {
-  try {
-    await axios.post("http://localhost:3000/api/payment", {
-      tableId: tableId,
-      items: items.map(item => ({
-        naziv: item.naziv,
-        cena: item.cena,
-        kolicina: item.kolicina,
-      }))
-    })
-    localStorage.removeItem(STORAGE_KEY)
-    setItems([])
-    onClose()
-  } catch (e) {
-    alert("Greška pri naplati!")
+  const handleNaplata = async () => {
+    try {
+      await api.post("/api/payment", {
+        tableId,
+        items: items.map(item => ({
+          naziv: item.naziv,
+          cena: item.cena,
+          kolicina: item.kolicina,
+        }))
+      })
+      localStorage.removeItem(STORAGE_KEY)
+      setItems([])
+      onClose()
+    } catch {
+      alert("Greška pri naplati!")
+    }
   }
-}
 
   const subtotal = items.reduce((sum, item) => sum + item.cena * item.kolicina, 0)
   const tax = Math.round(subtotal * 0.1)
@@ -146,7 +146,6 @@ const handleNaplata = async () => {
             )}
           </div>
 
-          {/* Dropdown */}
           {showSearch && filtered.length > 0 && (
             <div className="absolute left-8 right-8 top-28 bg-white border border-stone-200 rounded-2xl shadow-xl z-10 max-h-52 overflow-y-auto">
               {filtered.map((item, index) => (

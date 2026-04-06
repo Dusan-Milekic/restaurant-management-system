@@ -1,7 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import cors from "cors";
-import { Login ,GetUser,GetMeni, prisma, CreateInvoice,CreateReservation,GetReservations} from "../lib/prisma";
+import { Login ,GetUser,GetMeni, prisma, CreateInvoice,CreateReservation,GetReservations,GetTodayStats,GetPeriodicalStats} from "../lib/prisma";
 import { table } from "node:console";
 
 const app = express();
@@ -102,6 +102,25 @@ app.get("/api/reservations", async (req, res) => {
   try {
     const reservations = await GetReservations()
     return res.json({ reservations })
+  } catch (e) {
+    return res.status(500).json({ message: "Server error" })
+  }
+})
+
+app.get("/api/stats", async (req, res) => {
+  try {
+    const stats = await GetTodayStats()
+    return res.json(stats)
+  } catch (e) {
+    return res.status(500).json({ message: "Server error" })
+  }
+})
+
+app.get("/api/stats/period", async (req, res) => {
+  try {
+    const { from, to } = req.query
+    const stats = await GetPeriodicalStats(new Date(from as string), new Date(to as string))
+    return res.json(stats)
   } catch (e) {
     return res.status(500).json({ message: "Server error" })
   }

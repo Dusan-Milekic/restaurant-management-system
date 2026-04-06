@@ -105,4 +105,50 @@ async function GetReservations() {
   })
 }
 
-export { prisma, Login ,GetUser,GetMeni,CreateInvoice,CreateReservation,GetReservations};
+async function GetTodayStats() {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const tomorrow = new Date()
+  tomorrow.setHours(23, 59, 59, 999)
+
+  const invoices = await prisma.invoice.findMany({
+    where: {
+      createdAt: {
+        gte: today,
+        lte: tomorrow,
+      }
+    },
+    include: {
+      table: true,
+      items: true,
+    }
+  })
+
+  const total = invoices.reduce((sum, i) => sum + i.total, 0)
+  const count = invoices.length
+
+  return { invoices, total, count }
+}
+
+async function GetPeriodicalStats(from: Date, to: Date) {
+  const invoices = await prisma.invoice.findMany({
+    where: {
+      createdAt: {
+        gte: from,
+        lte: to,
+      }
+    },
+    include: {
+      table: true,
+      items: true,
+    }
+  })
+
+  const total = invoices.reduce((sum, i) => sum + i.total, 0)
+  const count = invoices.length
+
+  return { invoices, total, count }
+}
+
+export { prisma, Login ,GetUser,GetMeni,CreateInvoice,CreateReservation,GetReservations,GetTodayStats,GetPeriodicalStats};

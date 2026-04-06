@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "../lib/api"
 import { Stage, Layer, Rect, Circle, Text, Group } from "react-konva"
 import Navbar from "../components/Navbar"
 import Payment from "../components/Payment"
@@ -11,7 +11,7 @@ type Table = {
   kapacitet: number
   x: number
   y: number
-  shape: string,
+  shape: string
 }
 
 const BASE_WIDTH = 1440
@@ -56,7 +56,8 @@ function TableGroup({ table, onDragEnd, onClick }: {
   const isRect = table.shape === "rect"
   const width = isRect ? 140 : 100
   const height = isRect ? 80 : 100
-    const hasOrder = JSON.parse(localStorage.getItem(`order_table_${table.broj}`) ?? "[]").length > 0
+  const hasOrder = JSON.parse(localStorage.getItem(`order_table_${table.broj}`) ?? "[]").length > 0
+
   return (
     <Group
       x={table.x}
@@ -67,13 +68,13 @@ function TableGroup({ table, onDragEnd, onClick }: {
     >
       {isRound ? (
         <>
-         <Circle x={35} y={35} radius={35} fill={hasOrder ? "#fde68a" : "#fef3c7"} stroke={hasOrder ? "#d97706" : "#b45309"} strokeWidth={1.5} />
-         <Circle x={35} y={35} radius={35} fill={hasOrder ? "#fde68a" : "#fef3c7"} stroke={hasOrder ? "#d97706" : "#b45309"} strokeWidth={1.5} />
+          <Circle x={35} y={35} radius={38} fill={hasOrder ? "#d97706" : "#92400e"} opacity={0.3} />
+          <Circle x={35} y={35} radius={35} fill={hasOrder ? "#fde68a" : "#fef3c7"} stroke={hasOrder ? "#d97706" : "#b45309"} strokeWidth={1.5} />
         </>
       ) : (
         <>
           <Rect width={width + 4} height={height + 4} x={-2} y={-2} fill={hasOrder ? "#d97706" : "#92400e"} opacity={0.3} cornerRadius={10} />
-            <Rect width={width} height={height} fill={hasOrder ? "#fde68a" : "#fef3c7"} stroke={hasOrder ? "#d97706" : "#b45309"} strokeWidth={1.5} cornerRadius={8} />
+          <Rect width={width} height={height} fill={hasOrder ? "#fde68a" : "#fef3c7"} stroke={hasOrder ? "#d97706" : "#b45309"} strokeWidth={1.5} cornerRadius={8} />
         </>
       )}
       <Text
@@ -114,14 +115,14 @@ export default function TablePage() {
       return
     }
 
-    axios.post("http://localhost:3000/api/user", { token })
+    api.post("/api/user", { token })
       .then(res => setUser(res.data))
       .catch(() => {
         localStorage.removeItem("token")
         window.location.href = "/login"
       })
 
-    axios.get("http://localhost:3000/api/tables")
+    api.get("/api/tables")
       .then(res => setTables(res.data.tables))
       .catch(() => console.error("Greška pri učitavanju stolova"))
   }, [])
@@ -131,7 +132,7 @@ export default function TablePage() {
   }
 
   const saveLayout = async () => {
-    await axios.put("http://localhost:3000/api/tables/layout", { tables })
+    await api.put("/api/tables/layout", { tables })
     alert("Raspored sačuvan!")
   }
 
@@ -155,7 +156,6 @@ export default function TablePage() {
               table={table}
               onDragEnd={handleDragEnd}
               onClick={(t) => setSelectedTable(t)}
-              
             />
           ))}
         </Layer>
@@ -164,7 +164,10 @@ export default function TablePage() {
         <Payment
           tableId={selectedTable.id}
           tableNumber={selectedTable.broj}
-          onClose={() => setSelectedTable(null)}
+          onClose={() => {
+            setSelectedTable(null)
+            setTables(prev => [...prev])
+          }}
         />
       )}
     </>

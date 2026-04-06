@@ -1,9 +1,9 @@
 import { useEffect, useState,useRef } from "react"
-import axios from "axios"
+import api from "../lib/api"
 import Navbar from "../components/Navbar"
 import { useReactToPrint } from "react-to-print"
 import PrintInvoice from "../components/PrintInovice"
-
+import { useAuth } from "../hooks/useAuth"
 
 type InvoiceItem = {
   id: number
@@ -25,7 +25,7 @@ type Invoice = {
 }
 
 export default function InvoicesPage() {
-  const [user, setUser] = useState<{ username: string; name: string; lastName: string } | null>(null)
+
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [selected, setSelected] = useState<Invoice | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
@@ -34,28 +34,17 @@ export default function InvoicesPage() {
 
 
 
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) {
-      window.location.href = "/login"
-      return
-    }
+  const { userAuth } = useAuth()
 
-    axios.post("http://localhost:3000/api/user", { token })
-      .then(res => setUser(res.data))
-      .catch(() => {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-      })
-
-    axios.get("http://localhost:3000/api/invoices")
-      .then(res => setInvoices(res.data.invoices))
-      .catch(() => console.error("Greška pri učitavanju računa"))
-  }, [])
+useEffect(() => {
+  api.get("/api/invoices")
+    .then(res => setInvoices(res.data.invoices))
+    .catch(() => console.error("Greška pri učitavanju računa"))
+}, [])
 
   return (
     <>
-      <Navbar username={user?.username} name={user?.name} lastname={user?.lastName} />
+      <Navbar username={userAuth?.name} name={userAuth?.name} lastname={userAuth?.lastName} />
       <div className="max-w-5xl mx-auto px-6 py-10">
         <h1 className="font-serif text-3xl font-light tracking-widest uppercase text-stone-800 mb-10">
           Računi

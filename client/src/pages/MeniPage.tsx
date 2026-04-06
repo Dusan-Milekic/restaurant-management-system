@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import axios from "axios"
+import api from "../lib/api"
 import Navbar from "../components/Navbar"
-
+import { useAuth } from "../hooks/useAuth"
 type MeniItem = {
   id: number
   naziv: string
@@ -14,26 +14,16 @@ type MeniItem = {
 
 export default function MeniPage() {
   const [meni, setMeni] = useState<MeniItem[]>([])
-  const [user, setUser] = useState<{ username: string; name: string; lastName: string } | null>(null)
+  
 
-  useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) {
-      window.location.href = "/login"
-      return
-    }
+  const { userAuth } = useAuth()
 
-    axios.post("http://localhost:3000/api/user", { token })
-      .then(res => setUser(res.data))
-      .catch(() => {
-        localStorage.removeItem("token")
-        window.location.href = "/login"
-      })
+useEffect(() => {
+  api.get("/api/meni")
+    .then(res => setMeni(res.data.meni))
+    .catch(() => console.error("Greška pri učitavanju menija"))
+}, [])
 
-    axios.get("http://localhost:3000/api/meni")
-      .then(res => setMeni(res.data.meni))
-      .catch(() => console.error("Greška pri učitavanju menija"))
-  }, [])
 
   const grupisano = meni.reduce((acc, item) => {
     const kat = item.kategorija.nazivKategorije
@@ -45,7 +35,7 @@ export default function MeniPage() {
   return (
     <>
 
-      <Navbar username={user?.username} name={user?.name} lastname={user?.lastName} />
+      <Navbar username={userAuth?.username} name={userAuth?.name} lastname={userAuth?.lastName} />
       
       <div className="max-w-4xl mx-auto px-6 py-10">
         <h1 className="font-serif text-3xl font-light tracking-widest uppercase text-stone-800 mb-10">
