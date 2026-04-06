@@ -1,3 +1,4 @@
+import { response } from "express";
 import {prisma} from "../lib/prisma"
 
 async function main () {
@@ -5,12 +6,14 @@ async function main () {
         data: {
             username: "dusan20923",
             name: "Dusan",
-            lastName: "Milekic"
+            lastName: "Milekic",
+            password: "test123!"
         }
     });
 
 
 }
+
 
 main().then(async () => {
     await prisma.$disconnect();
@@ -19,3 +22,4 @@ main().then(async () => {
     console.error(e)
     await prisma.$disconnect();
 })
+
