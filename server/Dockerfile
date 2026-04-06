@@ -11,4 +11,4 @@ RUN npx prisma generate
 
 EXPOSE 3000
 
-CMD ["npx", "tsx", "main.ts"]
+CMD ["npx", "tsx", "api/main.ts"]
