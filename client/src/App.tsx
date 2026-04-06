@@ -1,15 +1,19 @@
 import './App.css'
-import LoginForm from './components/LoginForm'
-import Title from './components/Title'
+import DashboardPage from './pages/DashboardPage'
+import LoginPage from './pages/LoginPage'
+import { BrowserRouter,Routes,Route } from 'react-router-dom'
 
 function App() {
 
 
   return (
     <>
-      <Title/>
-      <img className='mt-20 m-auto' src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjKU8YDosyoTjWVSrMGvkVLFbrx2Xyn4qPrg&s' /> 
-      <LoginForm/>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage/>} />
+      </Routes>
+    </BrowserRouter>
       
     </>
   )

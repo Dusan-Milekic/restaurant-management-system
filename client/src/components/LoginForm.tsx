@@ -6,19 +6,24 @@ export default function LoginForm(){
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async () => {
-    try {
-      const res = await axios.post("http://localhost:3000/api/login", {
-        username,
-        password
-      })
-      console.log(res.data.message)
-      // ovde dodaj redirect ili sta vec treba
-    } catch (error){
-        console.log(error)
-    }
-  }
+const handleSubmit = async () => {
+  try {
+    const res = await axios.post("http://localhost:3000/api/login", {
+      username,
+      password
+    })
 
+    if (!res.data.token) {
+      setError("Wrong username or password")
+      return
+    }
+
+    localStorage.setItem("token", res.data.token)
+    window.location.href = "/dashboard"
+  } catch (error) {
+    setError("Something went wrong!")
+  }
+}
   return (
     <>
       <form className="flex flex-col border-2 border-amber-50 rounded-2xl mt-32 p-6 gap-2">
