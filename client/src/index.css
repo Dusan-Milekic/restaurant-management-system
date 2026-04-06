@@ -5,7 +5,7 @@
   min-height: 100svh;
 }
 body {
-  @apply bg-amber-900;
+  @apply bg-stone-50;
 }
 
 

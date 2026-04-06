@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
+import Navbar from "../components/Navbar"
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<{ username: string, name: string, lastname: string } | null>(null)
+  const [user, setUser] = useState<{ username: string; name: string; lastName: string } | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -21,7 +22,9 @@ export default function DashboardPage() {
 
   return (
     <>
-      <h1>Welcome: {user?.name} {user?.username} {user?.lastname}</h1>
+     
+
+      <Navbar username={user?.username} name={user?.name} lastname={user?.lastName} />
     </>
   )
 }

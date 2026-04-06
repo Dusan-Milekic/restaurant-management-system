@@ -21,3 +21,60 @@ model User {
   password String
   token String
 }
+
+model KategorijaMeni {
+  id             Int    @id @default(autoincrement())
+  nazivKategorije String
+  meni           Meni[]
+}
+
+model Meni {
+  id          Int            @id @default(autoincrement())
+  naziv       String
+  cena        Float
+  kategorijaId Int
+  kategorija  KategorijaMeni @relation(fields: [kategorijaId], references: [id])
+  
+}
+
+
+model Table {
+  id       Int    @id @default(autoincrement())
+  broj     Int
+  kapacitet Int
+  x        Float  @default(0)
+  y        Float  @default(0)
+  shape    String @default("square")
+  Invoices  Invoice[]
+  reservations Reservation[]
+
+}
+
+model Invoice {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  tax       Float
+  total     Float
+  tableId   Int
+  table     Table    @relation(fields: [tableId], references: [id])
+  createdAt DateTime @default(now())
+  items     InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        Int     @id @default(autoincrement())
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  naziv     String
+  cena      Float
+  kolicina  Int
+}
+
+model Reservation {
+  id             Int      @id @default(autoincrement())
+  nameReserved   String
+  tableId        Int
+  table          Table    @relation(fields: [tableId], references: [id])
+  date           DateTime
+  createdAt      DateTime @default(now())
+}

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client";
+import { Invoice, InvoiceItem, PrismaClient, Table } from "../generated/prisma/client";
 import { Pool } from "pg";
 import jwt from "jsonwebtoken"
 import dotenv from 'dotenv'
@@ -15,8 +15,6 @@ const pool = new Pool({
 
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
-
-
 
 
 async function Login(username: string, password: string) {
@@ -50,5 +48,61 @@ async function GetUser(token:string) {
     return user
 }
 
+async function GetMeni() {
+  return await prisma.meni.findMany({
+    include: {
+      kategorija: true
+    }
+  })
+}
 
-export { prisma, Login ,GetUser};
+async function CreateInvoice(tableId: number, items: { naziv: string, cena: number, kolicina: number }[]) {
+  const amount = items.reduce((sum, item) => sum + item.cena * item.kolicina, 0)
+  const tax = Math.round(amount * 0.1)
+  const total = amount + tax
+
+  return await prisma.invoice.create({
+    data: {
+      amount,
+      tax,
+      total,
+      tableId,
+      items: {
+        create: items.map(item => ({
+          naziv: item.naziv,
+          cena: item.cena,
+          kolicina: item.kolicina,
+        }))
+      }
+    },
+    include: {
+      items: true
+    }
+  })
+}
+
+async function CreateReservation(tableId: number, nameReserved: string, date: Date) {
+  return await prisma.reservation.create({
+    data: {
+      tableId,
+      nameReserved,
+      date,
+    },
+    include: {
+      table: true,
+    }
+  })
+}
+
+async function GetReservations() {
+  return await prisma.reservation.findMany({
+    include: {
+      table: true,
+    },
+    orderBy: {
+      date: "asc"
+    }
+  })
+}
+
+export { prisma, Login ,GetUser,GetMeni,CreateInvoice,CreateReservation,GetReservations};
