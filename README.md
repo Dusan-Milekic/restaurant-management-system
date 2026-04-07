@@ -4,6 +4,13 @@ A full-stack restaurant management system for handling tables, orders, invoices,
 
 **Live demo:** https://restaurant-management-system-two-nu.vercel.app
 
+## Demo Credentials
+
+| Username | Password |
+|----------|----------|
+| dusan20923 | test123! |
+
+
 ## Tech Stack
 
 **Frontend:** React, TypeScript, Tailwind CSS, React Konva, Vite  
